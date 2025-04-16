@@ -1658,10 +1658,10 @@
   resolved "https://registry.npmmirror.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-15.3.0.tgz#68740dee9831fcd738ab2056438bd3de75712f65"
   integrity sha512-vHUQS4YVGJPmpjn7r5lEZuMhK5UQBNBRSB+iGDvJjaNk649pTIcRluDWNb9siunyLLiu/LDPHfvxBtNamyuLTw==
 
-"@next/third-parties@^14.1.0":
-  version "14.2.28"
-  resolved "https://registry.npmmirror.com/@next/third-parties/-/third-parties-14.2.28.tgz#6c86ed75007117f079d60b44ae937f0cff5add4b"
-  integrity sha512-EYNzidIV5IP3p27SMltjjkJ4FH0Tp1hgAasCrVAPfRpimNdskadFkpoBN4K/dHmxFBPeMD62IF3JwWwk7K5Mcg==
+"@next/third-parties@^15.3.0":
+  version "15.3.0"
+  resolved "https://registry.npmmirror.com/@next/third-parties/-/third-parties-15.3.0.tgz#c87fe223bac2bc30210bcc6fb92d33dc14f682e6"
+  integrity sha512-fHgeIG5Pf/kW2Yi3man7r4y2f3uYA2sKIA9ylBvD/q9kg8sNWODBm4pYRatdIGosNkHZjVoNUlK85AQ0SP3Rkw==
   dependencies:
     third-party-capital "1.0.20"
 
@@ -2276,27 +2276,27 @@
   dependencies:
     undici-types "~6.21.0"
 
-"@types/node@^20.11.30":
-  version "20.17.30"
-  resolved "https://registry.npmmirror.com/@types/node/-/node-20.17.30.tgz#1d93f656d3b869dbef7b796568ac457606ba58d0"
-  integrity sha512-7zf4YyHA+jvBNfVrk2Gtvs6x7E8V+YDW05bNfG2XkWDJfYRXrTiP/DsB2zSYTaHX0bGIujTBQdMVAhb+j7mwpg==
+"@types/node@^22.14.1":
+  version "22.14.1"
+  resolved "https://registry.npmmirror.com/@types/node/-/node-22.14.1.tgz#53b54585cec81c21eee3697521e31312d6ca1e6f"
+  integrity sha512-u0HuPQwe/dHrItgHHpmw3N2fYCR6x4ivMNbPHRkBVP4CvN+kiRrKHWk3i8tXiO/joPwXLMYvF9TTF0eqgHIuOw==
   dependencies:
-    undici-types "~6.19.2"
+    undici-types "~6.21.0"
 
 "@types/parse-json@^4.0.0":
   version "4.0.2"
   resolved "https://registry.npmmirror.com/@types/parse-json/-/parse-json-4.0.2.tgz#5950e50960793055845e956c427fc2b0d70c5239"
   integrity sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==
 
-"@types/prop-types@*", "@types/prop-types@^15.0.0":
+"@types/prop-types@^15.0.0":
   version "15.7.14"
   resolved "https://registry.npmmirror.com/@types/prop-types/-/prop-types-15.7.14.tgz#1433419d73b2a7ebfc6918dcefd2ec0d5cd698f2"
   integrity sha512-gNMvNH49DJ7OJYv+KAKn0Xp45p8PLl6zo2YnvDIbTd4J6MER2BmWN49TG7n9LvkyihINxeKW8+3bfS2yDC9dzQ==
 
-"@types/react-dom@^18.2.7":
-  version "18.3.6"
-  resolved "https://registry.npmmirror.com/@types/react-dom/-/react-dom-18.3.6.tgz#fa59a5e9a33499a792af6c1130f55921ef49d268"
-  integrity sha512-nf22//wEbKXusP6E9pfOCDwFdHAX4u172eaJI4YkDRQEZiorm6KfYnSC2SWLDMVWUOWPERmJnN0ujeAfTBLvrw==
+"@types/react-dom@^19.1.2":
+  version "19.1.2"
+  resolved "https://registry.npmmirror.com/@types/react-dom/-/react-dom-19.1.2.tgz#bd1fe3b8c28a3a2e942f85314dcfb71f531a242f"
+  integrity sha512-XGJkWF41Qq305SKWEILa1O8vzhb3aOo3ogBlSmiqNko/WmRb6QIaweuZCXjKygVDXpzXb5wyxKTSOsmkuqj+Qw==
 
 "@types/react-katex@^3.0.0":
   version "3.0.4"
@@ -2312,12 +2312,11 @@
   dependencies:
     csstype "^3.0.2"
 
-"@types/react@^18.2.70":
-  version "18.3.20"
-  resolved "https://registry.npmmirror.com/@types/react/-/react-18.3.20.tgz#b0dccda9d2f1bc24d2a04b1d0cb5d0b9a3576ad3"
-  integrity sha512-IPaCZN7PShZK/3t6Q87pfTkRm6oLTd4vztyoj+cbHUF1g3FfVb2tFIL79uCRKEfv16AhqDMBywP2VW3KIZUvcg==
+"@types/react@^19.1.2":
+  version "19.1.2"
+  resolved "https://registry.npmmirror.com/@types/react/-/react-19.1.2.tgz#11df86f66f188f212c90ecb537327ec68bfd593f"
+  integrity sha512-oxLPMytKchWGbnQM9O7D67uPa9paTNxO7jVoNMXgkkErULBPhPARCfkKL9ytcIJJRGjbsVwW4ugJzyFFvm/Tiw==
   dependencies:
-    "@types/prop-types" "*"
     csstype "^3.0.2"
 
 "@types/spark-md5@^3.0.4":
@@ -7168,10 +7167,10 @@ onetime@^6.0.0:
   dependencies:
     mimic-fn "^4.0.0"
 
-openapi-client-axios@^7.5.5:
-  version "7.5.5"
-  resolved "https://registry.npmmirror.com/openapi-client-axios/-/openapi-client-axios-7.5.5.tgz#4cb2bb7484ff9d1c92d9ff509db235cc35d64f38"
-  integrity sha512-pgCo1z+rxtYmGQXzB+N5DiXvRurTP6JqV+Ao/wtaGUMIIIM+znh3nTztps+FZS8mZgWnDHpdEzL9bWtZuWuvoA==
+openapi-client-axios@^7.6.0:
+  version "7.6.0"
+  resolved "https://registry.npmmirror.com/openapi-client-axios/-/openapi-client-axios-7.6.0.tgz#28f44c6050e9b0604a6f8ba57c3a168f4c61645d"
+  integrity sha512-WfOjOtGaYDKCtf7mbLD4AH1HcJRo6VRFdHNNZClgihloYGkNyD/E/34l1LH0Vx2XHLGqP9phIid2rUFmVfbG7A==
   dependencies:
     bath-es5 "^3.0.3"
     dereference-json-schema "^0.2.1"
@@ -8671,11 +8670,6 @@ unbox-primitive@^1.1.0:
     has-bigints "^1.0.2"
     has-symbols "^1.1.0"
     which-boxed-primitive "^1.1.1"
-
-undici-types@~6.19.2:
-  version "6.19.8"
-  resolved "https://registry.npmmirror.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
-  integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 undici-types@~6.21.0:
   version "6.21.0"
