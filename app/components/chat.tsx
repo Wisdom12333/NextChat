@@ -1,6 +1,7 @@
 import { useDebouncedCallback } from "use-debounce";
 import React, {
   Fragment,
+  JSX,
   RefObject,
   useCallback,
   useEffect,
@@ -33,7 +34,6 @@ import PinIcon from "../icons/pin.svg";
 import ConfirmIcon from "../icons/confirm.svg";
 import CloseIcon from "../icons/close.svg";
 import CancelIcon from "../icons/cancel.svg";
-import ImageIcon from "../icons/image.svg";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -67,20 +67,20 @@ import {
   copyToClipboard,
   getMessageImages,
   getMessageTextContent,
+  getModelSizes,
   isDalle3,
   isVisionModel,
   safeLocalStorage,
-  getModelSizes,
-  supportsCustomSize,
-  useMobileScreen,
   selectOrCopy,
   showPlugins,
+  supportsCustomSize,
+  useMobileScreen,
 } from "../utils";
 
 import { uploadImage as uploadImageRemote } from "@/app/utils/chat";
 
 import dynamic from "next/dynamic";
-
+import Image from "next/image";
 import { ChatControllerPool } from "../client/controller";
 import { DalleQuality, DalleStyle, ModelSize } from "../typing";
 import { Prompt, usePromptStore } from "../store/prompt";
@@ -148,7 +148,7 @@ const MCPAction = () => {
         setCount(count);
       }
     };
-    checkMcpStatus();
+    checkMcpStatus().then();
   }, []);
 
   if (!mcpEnabled) return null;
@@ -284,7 +284,7 @@ function useSubmitHandler() {
 
   const shouldSubmit = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // Fix Chinese input method "Enter" on Safari
-    if (e.keyCode == 229) return false;
+    if (e.key == "Process") return false;
     if (e.key !== "Enter") return false;
     if (e.key === "Enter" && (e.nativeEvent.isComposing || isComposing.current))
       return false;
@@ -492,7 +492,6 @@ function useScrollToBottom(
 }
 
 export function ChatActions(props: {
-  uploadImage: () => void;
   setAttachImages: (images: string[]) => void;
   setUploading: (uploading: boolean) => void;
   showPromptModal: () => void;
@@ -535,11 +534,10 @@ export function ChatActions(props: {
     const defaultModel = filteredModels.find((m) => m.isDefault);
 
     if (defaultModel) {
-      const arr = [
+      return [
         defaultModel,
         ...filteredModels.filter((m) => m !== defaultModel),
       ];
-      return arr;
     } else {
       return filteredModels;
     }
@@ -554,13 +552,12 @@ export function ChatActions(props: {
   }, [models, currentModel, currentProviderName]);
   const [showModelSelector, setShowModelSelector] = useState(false);
   const [showPluginSelector, setShowPluginSelector] = useState(false);
-  const [showUploadImage, setShowUploadImage] = useState(false);
 
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [showQualitySelector, setShowQualitySelector] = useState(false);
   const [showStyleSelector, setShowStyleSelector] = useState(false);
   const modelSizes = getModelSizes(currentModel);
-  const dalle3Qualitys: DalleQuality[] = ["standard", "hd"];
+  const dalleQualities: DalleQuality[] = ["standard", "hd"];
   const dalle3Styles: DalleStyle[] = ["vivid", "natural"];
   const currentSize =
     session.mask.modelConfig?.size ?? ("1024x1024" as ModelSize);
@@ -571,7 +568,6 @@ export function ChatActions(props: {
 
   useEffect(() => {
     const show = isVisionModel(currentModel);
-    setShowUploadImage(show);
     if (!show) {
       props.setAttachImages([]);
       props.setUploading(false);
@@ -594,7 +590,7 @@ export function ChatActions(props: {
           : nextModel.name,
       );
     }
-  }, [chatStore, currentModel, models, session]);
+  }, [chatStore, currentModel, models, props, session]);
 
   return (
     <div className={styles["chat-input-actions"]}>
@@ -621,13 +617,6 @@ export function ChatActions(props: {
           />
         )}
 
-        {showUploadImage && (
-          <ChatAction
-            onClick={props.uploadImage}
-            text={Locale.Chat.InputActions.UploadImage}
-            icon={props.uploading ? <LoadingButtonIcon /> : <ImageIcon />}
-          />
-        )}
         <ChatAction
           onClick={nextTheme}
           text={Locale.Chat.InputActions.Theme[theme]}
@@ -752,7 +741,7 @@ export function ChatActions(props: {
         {showQualitySelector && (
           <Selector
             defaultSelectedValue={currentQuality}
-            items={dalle3Qualitys.map((m) => ({
+            items={dalleQualities.map((m) => ({
               title: m,
               value: m,
             }))}
@@ -920,7 +909,9 @@ export function DeleteImageButton(props: { deleteImage: () => void }) {
 }
 
 export function ShortcutKeyModal(props: { onClose: () => void }) {
-  const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  const isMac =
+    typeof navigator !== "undefined" &&
+    navigator.userAgent?.toUpperCase().includes("MAC");
   const shortcuts = [
     {
       title: Locale.Chat.ShortcutKey.newChat,
@@ -986,7 +977,7 @@ export function ShortcutKeyModal(props: { onClose: () => void }) {
   );
 }
 
-function _Chat() {
+function ChatComponent() {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
   const chatStore = useChatStore();
@@ -1001,7 +992,7 @@ function _Chat() {
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { submitKey, shouldSubmit } = useSubmitHandler();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null!);
   const isScrolledToBottom = scrollRef?.current
     ? Math.abs(
         scrollRef.current.scrollHeight -
@@ -1017,7 +1008,7 @@ function _Chat() {
       scrollRef.current.getBoundingClientRect().top;
     // leave some space for user question
     return topDistance < 100;
-  }, [scrollRef?.current?.scrollHeight]);
+  }, []);
 
   const isTyping = userInput !== "";
 
@@ -1292,7 +1283,7 @@ function _Chat() {
       ttsPlayer.stop();
       setSpeechStatus(false);
     } else {
-      var api: ClientApi;
+      let api: ClientApi;
       api = new ClientApi(ModelProvider.GPT);
       const config = useAppConfig.getState();
       setSpeechLoading(true);
@@ -1552,51 +1543,6 @@ function _Chat() {
     [attachImages, chatStore],
   );
 
-  async function uploadImage() {
-    const images: string[] = [];
-    images.push(...attachImages);
-
-    images.push(
-      ...(await new Promise<string[]>((res, rej) => {
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept =
-          "image/png, image/jpeg, image/webp, image/heic, image/heif";
-        fileInput.multiple = true;
-        fileInput.onchange = (event: any) => {
-          setUploading(true);
-          const files = event.target.files;
-          const imagesData: string[] = [];
-          for (let i = 0; i < files.length; i++) {
-            const file = event.target.files[i];
-            uploadImageRemote(file)
-              .then((dataUrl) => {
-                imagesData.push(dataUrl);
-                if (
-                  imagesData.length === 3 ||
-                  imagesData.length === files.length
-                ) {
-                  setUploading(false);
-                  res(imagesData);
-                }
-              })
-              .catch((e) => {
-                setUploading(false);
-                rej(e);
-              });
-          }
-        };
-        fileInput.click();
-      })),
-    );
-
-    const imagesLength = images.length;
-    if (imagesLength > 3) {
-      images.splice(3, imagesLength - 3);
-    }
-    setAttachImages(images);
-  }
-
   // 快捷键 shortcut keys
   const [showShortcutKeyModal, setShowShortcutKeyModal] = useState(false);
 
@@ -1644,7 +1590,7 @@ function _Chat() {
           .pop();
         if (lastNonUserMessage) {
           const lastMessageContent = getMessageTextContent(lastNonUserMessage);
-          copyToClipboard(lastMessageContent);
+          copyToClipboard(lastMessageContent).then();
         }
       }
       // 展示快捷键 command + /
@@ -1682,7 +1628,7 @@ function _Chat() {
   return (
     <>
       <div className={styles.chat} key={session.id}>
-        <div className="window-header" data-tauri-drag-region>
+        <div className="window-header" data-tauri-drag-region="true">
           {isMobileScreen && (
             <div className="window-actions">
               <div className={"window-action-button"}>
@@ -1986,7 +1932,7 @@ function _Chat() {
                               defaultShow={i >= messages.length - 6}
                             />
                             {getMessageImages(message).length == 1 && (
-                              <img
+                              <Image
                                 className={styles["chat-message-item-image"]}
                                 src={getMessageImages(message)[0]}
                                 alt=""
@@ -2005,7 +1951,7 @@ function _Chat() {
                                 {getMessageImages(message).map(
                                   (image, index) => {
                                     return (
-                                      <img
+                                      <Image
                                         className={
                                           styles[
                                             "chat-message-item-image-multi"
@@ -2046,7 +1992,6 @@ function _Chat() {
               />
 
               <ChatActions
-                uploadImage={uploadImage}
                 setAttachImages={setAttachImages}
                 setUploading={setUploading}
                 showPromptModal={() => setShowPromptModal(true)}
@@ -2167,5 +2112,5 @@ function _Chat() {
 export function Chat() {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
-  return <_Chat key={session.id}></_Chat>;
+  return <ChatComponent key={session.id}></ChatComponent>;
 }
