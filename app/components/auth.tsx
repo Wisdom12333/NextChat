@@ -1,6 +1,6 @@
 import styles from "./auth.module.scss";
 import { IconButton } from "./button";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Path, SAAS_CHAT_URL } from "../constant";
 import { useAccessStore } from "../store";
@@ -8,19 +8,16 @@ import Locale from "../locales";
 import Delete from "../icons/close.svg";
 import Arrow from "../icons/arrow.svg";
 import Logo from "../icons/logo.svg";
-import { useMobileScreen } from "@/app/utils";
+import { safeLocalStorage, useMobileScreen } from "@/app/utils";
 import BotIcon from "../icons/bot.svg";
 import { getClientConfig } from "../config/client";
 import { PasswordInput } from "./ui-lib";
 import LeftIcon from "@/app/icons/left.svg";
-import { safeLocalStorage } from "@/app/utils";
 import {
-  trackSettingsPageGuideToCPaymentClick,
   trackAuthorizationPageButtonToCPaymentClick,
+  trackSettingsPageGuideToCPaymentClick,
 } from "../utils/auth-settings-events";
 import clsx from "clsx";
-
-const storage = safeLocalStorage();
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -131,6 +128,7 @@ function TopBanner() {
   const [isVisible, setIsVisible] = useState(true);
   const isMobile = useMobileScreen();
   useEffect(() => {
+    const storage = safeLocalStorage();
     // 检查 localStorage 中是否有标记
     const bannerDismissed = storage.getItem("bannerDismissed");
     // 如果标记不存在，存储默认值并显示横幅
@@ -152,6 +150,7 @@ function TopBanner() {
   };
 
   const handleClose = () => {
+    const storage = safeLocalStorage();
     setIsVisible(false);
     storage.setItem("bannerDismissed", "true");
   };

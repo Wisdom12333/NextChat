@@ -5,7 +5,7 @@ import { collectModelsWithDefaultModel } from "./model";
 export function useAllModels() {
   const accessStore = useAccessStore();
   const configStore = useAppConfig();
-  const models = useMemo(() => {
+  return useMemo(() => {
     return collectModelsWithDefaultModel(
       configStore.models,
       [configStore.customModels, accessStore.customModels].join(","),
@@ -17,6 +17,4 @@ export function useAllModels() {
     configStore.customModels,
     configStore.models,
   ]);
-
-  return models;
 }

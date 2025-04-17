@@ -16,11 +16,11 @@ import { getClientApi } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { showToast } from "../components/ui-lib";
 import {
+  DEEPSEEK_SUMMARIZE_MODEL,
   DEFAULT_INPUT_TEMPLATE,
   DEFAULT_MODELS,
   DEFAULT_SYSTEM_TEMPLATE,
   GEMINI_SUMMARIZE_MODEL,
-  DEEPSEEK_SUMMARIZE_MODEL,
   KnowledgeCutOffDate,
   MCP_SYSTEM_TEMPLATE,
   MCP_TOOLS_TEMPLATE,
@@ -38,8 +38,6 @@ import { collectModelsWithDefaultModel } from "../utils/model";
 import { createEmptyMask, Mask } from "./mask";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
-
-const localStorage = safeLocalStorage();
 
 export type ChatMessageTool = {
   id: string;
@@ -814,6 +812,7 @@ export const useChatStore = createPersistStore(
       },
       async clearAllData() {
         await indexedDBStorage.clear();
+        const localStorage = safeLocalStorage();
         localStorage.clear();
         location.reload();
       },

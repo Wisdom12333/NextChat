@@ -3,13 +3,14 @@ import { showToast } from "./components/ui-lib";
 import Locale from "./locales";
 import { RequestMessage } from "./client/api";
 import {
+  EXCLUDE_VISION_MODEL_REGEXES,
   REQUEST_TIMEOUT_MS,
   REQUEST_TIMEOUT_MS_FOR_THINKING,
   ServiceProvider,
+  VISION_MODEL_REGEXES,
 } from "./constant";
 // import { fetch as tauriFetch, ResponseType } from "@tauri-apps/api/http";
 import { fetch as tauriStreamFetch } from "./utils/stream";
-import { VISION_MODEL_REGEXES, EXCLUDE_VISION_MODEL_REGEXES } from "./constant";
 import { useAccessStore } from "./store";
 import { ModelSize } from "./typing";
 
@@ -380,17 +381,17 @@ export function safeLocalStorage(): {
   removeItem: (key: string) => void;
   clear: () => void;
 } {
-  let storage: Storage | null;
+  let storage: Storage | undefined;
 
   try {
     if (typeof window !== "undefined" && window.localStorage) {
       storage = window.localStorage;
     } else {
-      storage = null;
+      storage = undefined;
     }
   } catch (e) {
     console.error("localStorage is not available:", e);
-    storage = null;
+    storage = undefined;
   }
 
   return {

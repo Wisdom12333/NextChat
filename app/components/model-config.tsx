@@ -19,6 +19,7 @@ export function ModelConfigList(props: {
     "provider.providerName",
   );
   const value = `${props.modelConfig.model}@${props.modelConfig?.providerName}`;
+  console.log("value++" + value);
   const compressModelValue = `${props.modelConfig.compressModel}@${props.modelConfig?.compressProviderName}`;
 
   return (
@@ -110,7 +111,7 @@ export function ModelConfigList(props: {
         ></input>
       </ListItem>
 
-      {props.modelConfig?.providerName == ServiceProvider.Google ? null : (
+      {
         <>
           <ListItem
             title={Locale.Settings.PresencePenalty.Title}
@@ -190,7 +191,7 @@ export function ModelConfigList(props: {
             ></input>
           </ListItem>
         </>
-      )}
+      }
       <ListItem
         title={Locale.Settings.HistoryCount.Title}
         subTitle={Locale.Settings.HistoryCount.SubTitle}

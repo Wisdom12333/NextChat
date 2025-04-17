@@ -4,8 +4,7 @@ import "./styles/markdown.scss";
 import "./styles/highlight.scss";
 import { getClientConfig } from "./config/client";
 import type { Metadata, Viewport } from "next";
-import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
-import { getServerSideConfig } from "./config/server";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "NextChat",
@@ -31,11 +30,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const serverConfig = getServerSideConfig();
-
   return (
-    <html lang="en">
-      <head title="">
+    <html>
+      <head>
         <meta name="config" content={JSON.stringify(getClientConfig())} />
         <meta
           name="viewport"
@@ -47,20 +44,9 @@ export default function RootLayout({
           crossOrigin="use-credentials"
         ></link>
         <script src="/serviceWorkerRegister.js" defer></script>
+        <title></title>
       </head>
-      <body>
-        {children}
-        {serverConfig?.gtmId && (
-          <>
-            <GoogleTagManager gtmId={serverConfig.gtmId} />
-          </>
-        )}
-        {serverConfig?.gaId && (
-          <>
-            <GoogleAnalytics gaId={serverConfig.gaId} />
-          </>
-        )}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -126,8 +126,6 @@ import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
 
-const localStorage = safeLocalStorage();
-
 const ttsPlayer = createTTSPlayer();
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
@@ -1485,6 +1483,7 @@ function ChatComponent() {
 
   // remember unfinished input
   useEffect(() => {
+    const localStorage = safeLocalStorage();
     // try to load from local storage
     const key = UNFINISHED_INPUT(session.id);
     const mayBeUnfinishedInput = localStorage.getItem(key);
