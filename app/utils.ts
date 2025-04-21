@@ -29,7 +29,7 @@ export function trimTopic(topic: string) {
 export async function copyToClipboard(text: string) {
   try {
     if (window.__TAURI__) {
-      window.__TAURI__.writeText(text);
+      await window.__TAURI__.writeText(text);
     } else {
       await navigator.clipboard.writeText(text);
     }
@@ -163,7 +163,7 @@ export function selectOrCopy(el: HTMLElement, content: string) {
     return false;
   }
 
-  copyToClipboard(content);
+  copyToClipboard(content).then();
 
   return true;
 }
@@ -172,8 +172,7 @@ function getDomContentWidth(dom: HTMLElement) {
   const style = window.getComputedStyle(dom);
   const paddingWidth =
     parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-  const width = dom.clientWidth - paddingWidth;
-  return width;
+  return dom.clientWidth - paddingWidth;
 }
 
 function getOrCreateMeasureDom(id: string, init?: (dom: HTMLElement) => void) {
@@ -212,10 +211,7 @@ export function autoGrowTextArea(dom: HTMLTextAreaElement) {
     window.getComputedStyle(singleLineDom).height,
   );
 
-  const rows =
-    Math.round(height / singleLineHeight) + (endWithEmptyLine ? 1 : 0);
-
-  return rows;
+  return Math.round(height / singleLineHeight) + (endWithEmptyLine ? 1 : 0);
 }
 
 export function getCSSVar(varName: string) {
@@ -228,8 +224,7 @@ export function getCSSVar(varName: string) {
 export function isMacOS(): boolean {
   if (typeof window !== "undefined") {
     let userAgent = window.navigator.userAgent.toLocaleLowerCase();
-    const macintosh = /iphone|ipad|ipod|macintosh/.test(userAgent);
-    return !!macintosh;
+    return /iphone|ipad|ipod|macintosh/.test(userAgent);
   }
   return false;
 }
@@ -334,21 +329,7 @@ export function supportsCustomSize(model: string): boolean {
 }
 
 export function showPlugins(provider: ServiceProvider, model: string) {
-  if (
-    provider == ServiceProvider.OpenAI ||
-    provider == ServiceProvider.Azure ||
-    provider == ServiceProvider.Moonshot ||
-    provider == ServiceProvider.ChatGLM
-  ) {
-    return true;
-  }
-  if (provider == ServiceProvider.Anthropic && !model.includes("claude-2")) {
-    return true;
-  }
-  if (provider == ServiceProvider.Google && !model.includes("vision")) {
-    return true;
-  }
-  return false;
+  return provider == ServiceProvider.OpenAI;
 }
 
 export function fetch(
@@ -361,7 +342,7 @@ export function fetch(
   return window.fetch(url, options);
 }
 
-export function adapter(config: Record<string, unknown>) {
+export async function adapter(config: Record<string, unknown>) {
   const { baseURL, url, params, data: body, ...rest } = config;
   const path = baseURL ? `${baseURL}${url}` : url;
   const fetchUrl = params
@@ -455,7 +436,7 @@ export function clientUpdate() {
       if (updateResult.shouldUpdate) {
         window.__TAURI__?.updater
           .installUpdate()
-          .then((result) => {
+          .then(() => {
             showToast(Locale.Settings.Update.Success);
           })
           .catch((e) => {

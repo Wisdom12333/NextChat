@@ -1,7 +1,5 @@
 "use client";
 
-require("../polyfill");
-
 import React, { useEffect, useState } from "react";
 import styles from "./home.module.scss";
 
@@ -14,7 +12,7 @@ import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
 import { ErrorBoundary } from "./error";
 
-import { getISOLang, getLang } from "../locales";
+import { getISOLang } from "../locales";
 
 import {
   HashRouter as Router,
@@ -29,6 +27,8 @@ import { type ClientApi, getClientApi } from "../client/api";
 import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
+
+require("../polyfill");
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -55,12 +55,9 @@ const NewChat = dynamic(async () => (await import("./new-chat")).NewChat, {
   loading: () => <Loading noLogo />,
 });
 
-const McpMarketPage = dynamic(
-  async () => (await import("./mcp-market")).McpMarketPage,
-  {
-    loading: () => <Loading noLogo />,
-  },
-);
+const MaskPage = dynamic(async () => (await import("./mask")).MaskPage, {
+  loading: () => <Loading noLogo />,
+});
 
 export function useSwitchTheme() {
   const config = useAppConfig();
@@ -170,9 +167,9 @@ function Screen() {
           <Routes>
             <Route path={Path.Home} element={<Chat />} />
             <Route path={Path.NewChat} element={<NewChat />} />
+            <Route path={Path.Masks} element={<MaskPage />} />
             <Route path={Path.Chat} element={<Chat />} />
             <Route path={Path.Settings} element={<Settings />} />
-            <Route path={Path.McpMarket} element={<McpMarketPage />} />
           </Routes>
         </WindowContent>
       </>
@@ -183,7 +180,7 @@ function Screen() {
     <div
       className={clsx(styles.container, {
         [styles["tight-container"]]: shouldTightBorder,
-        [styles["rtl-screen"]]: getLang() === "ar",
+        [styles["rtl-screen"]]: false,
       })}
     >
       {renderContent()}

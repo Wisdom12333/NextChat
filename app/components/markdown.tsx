@@ -5,15 +5,14 @@ import RemarkBreaks from "remark-breaks";
 import RehypeKatex from "rehype-katex";
 import RemarkGfm from "remark-gfm";
 import RehypeHighlight from "rehype-highlight";
-import { useRef, useState, RefObject, useEffect, useMemo } from "react";
+import React, { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { copyToClipboard, useWindowSize } from "../utils";
 import mermaid from "mermaid";
 import Locale from "../locales";
 import LoadingIcon from "../icons/three-dots.svg";
 import ReloadButtonIcon from "../icons/reload.svg";
-import React from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { showImageModal, FullScreen } from "./ui-lib";
+import { FullScreen, showImageModal } from "./ui-lib";
 import {
   ArtifactsShareButton,
   HTMLPreview,
@@ -22,7 +21,7 @@ import {
 import { useChatStore } from "../store";
 import { IconButton } from "./button";
 
-import { useAppConfig } from "../store/config";
+import { useAppConfig } from "@/app/store";
 import clsx from "clsx";
 
 export function Mermaid(props: { code: string }) {
@@ -128,7 +127,7 @@ export function PreCode(props: { children: any }) {
       });
       setTimeout(renderArtifacts, 1);
     }
-  }, []);
+  }, [renderArtifacts]);
 
   return (
     <>
@@ -139,7 +138,7 @@ export function PreCode(props: { children: any }) {
             if (ref.current) {
               copyToClipboard(
                 ref.current.querySelector("code")?.innerText ?? "",
-              );
+              ).then();
             }
           }}
         ></span>
@@ -230,7 +229,7 @@ function CustomCode(props: { children: any; className?: string }) {
 
 function escapeBrackets(text: string) {
   const pattern =
-    /(```[\s\S]*?```|`.*?`)|\\\[([\s\S]*?[^\\])\\\]|\\\((.*?)\\\)/g;
+    /(```[\s\S]*?```|`.*?`)|\\\[([\s\S]*?[^\\])\\]|\\\((.*?)\\\)/g;
   return text.replace(
     pattern,
     (match, codeBlock, squareBracket, roundBracket) => {
@@ -254,20 +253,20 @@ function tryWrapHtmlCode(text: string) {
   }
   return text
     .replace(
-      /([`]*?)(\w*?)([\n\r]*?)(<!DOCTYPE html>)/g,
+      /(`*?)(\w*?)([\n\r]*?)(<!DOCTYPE html>)/g,
       (match, quoteStart, lang, newLine, doctype) => {
         return !quoteStart ? "\n```html\n" + doctype : match;
       },
     )
     .replace(
-      /(<\/body>)([\r\n\s]*?)(<\/html>)([\n\r]*)([`]*)([\n\r]*?)/g,
+      /(<\/body>)([\r\n\s]*?)(<\/html>)([\n\r]*)(`*)([\n\r]*?)/g,
       (match, bodyEnd, space, htmlEnd, newLine, quoteEnd) => {
         return !quoteEnd ? bodyEnd + space + htmlEnd + "\n```\n" : match;
       },
     );
 }
 
-function _MarkDownContent(props: { content: string }) {
+function MarkDownContentComponent(props: { content: string }) {
   const escapedContent = useMemo(() => {
     return tryWrapHtmlCode(escapeBrackets(props.content));
   }, [props.content]);
@@ -290,6 +289,7 @@ function _MarkDownContent(props: { content: string }) {
         code: CustomCode,
         p: (pProps) => <p {...pProps} dir="auto" />,
         a: (aProps) => {
+          // @ts-ignore
           const href = aProps.href || "";
           if (/\.(aac|mp3|opus|wav)$/.test(href)) {
             return (
@@ -306,7 +306,8 @@ function _MarkDownContent(props: { content: string }) {
             );
           }
           const isInternal = /^\/#/i.test(href);
-          const target = isInternal ? "_self" : aProps.target ?? "_blank";
+          // @ts-ignore
+          const target = isInternal ? "_self" : (aProps.target ?? "_blank");
           return <a {...aProps} target={target} />;
         },
       }}
@@ -316,7 +317,7 @@ function _MarkDownContent(props: { content: string }) {
   );
 }
 
-export const MarkdownContent = React.memo(_MarkDownContent);
+export const MarkdownContent = React.memo(MarkDownContentComponent);
 
 export function Markdown(
   props: {

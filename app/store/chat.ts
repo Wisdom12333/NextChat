@@ -20,7 +20,6 @@ import {
   DEFAULT_INPUT_TEMPLATE,
   DEFAULT_MODELS,
   DEFAULT_SYSTEM_TEMPLATE,
-  GEMINI_SUMMARIZE_MODEL,
   KnowledgeCutOffDate,
   MCP_SYSTEM_TEMPLATE,
   MCP_TOOLS_TEMPLATE,
@@ -140,9 +139,7 @@ function getSummarizeModel(
       ];
     }
   }
-  if (currentModel.startsWith("gemini")) {
-    return [GEMINI_SUMMARIZE_MODEL, ServiceProvider.Google];
-  } else if (currentModel.startsWith("deepseek-")) {
+  if (currentModel.startsWith("deepseek-")) {
     return [DEEPSEEK_SUMMARIZE_MODEL, ServiceProvider.DeepSeek];
   }
 
@@ -162,7 +159,7 @@ function fillTemplateWith(input: string, modelConfig: ModelConfig) {
   // Find the model in the DEFAULT_MODELS array that matches the modelConfig.model
   const modelInfo = DEFAULT_MODELS.find((m) => m.name === modelConfig.model);
 
-  var serviceProvider = "OpenAI";
+  let serviceProvider = "OpenAI";
   if (modelInfo) {
     // TODO: auto detect the providerName from the modelConfig.model
 
@@ -456,7 +453,7 @@ export const useChatStore = createPersistStore(
 
         const api: ClientApi = getClientApi(modelConfig.providerName);
         // make request
-        api.llm.chat({
+        await api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: true },
           onUpdate(message) {
@@ -556,7 +553,7 @@ export const useChatStore = createPersistStore(
         const mcpEnabled = await isMcpEnabled();
         const mcpSystemPrompt = mcpEnabled ? await getMcpSystemPrompt() : "";
 
-        var systemPrompts: ChatMessage[] = [];
+        let systemPrompts: ChatMessage[] = [];
 
         if (shouldInjectSystemPrompts) {
           systemPrompts = [
@@ -627,14 +624,12 @@ export const useChatStore = createPersistStore(
           reversedRecentMessages.push(msg);
         }
         // concat all messages
-        const recentMessages = [
+        return [
           ...systemPrompts,
           ...longTermMemoryPrompts,
           ...contextPrompts,
           ...reversedRecentMessages.reverse(),
         ];
-
-        return recentMessages;
       },
 
       updateMessage(
@@ -703,24 +698,28 @@ export const useChatStore = createPersistStore(
                 content: Locale.Store.Prompt.Topic,
               }),
             );
-          api.llm.chat({
-            messages: topicMessages,
-            config: {
-              model,
-              stream: false,
-              providerName,
-            },
-            onFinish(message, responseRes) {
-              if (responseRes?.status === 200) {
-                get().updateTargetSession(
-                  session,
-                  (session) =>
-                    (session.topic =
-                      message.length > 0 ? trimTopic(message) : DEFAULT_TOPIC),
-                );
-              }
-            },
-          });
+          api.llm
+            .chat({
+              messages: topicMessages,
+              config: {
+                model,
+                stream: false,
+                providerName,
+              },
+              onFinish(message, responseRes) {
+                if (responseRes?.status === 200) {
+                  get().updateTargetSession(
+                    session,
+                    (session) =>
+                      (session.topic =
+                        message.length > 0
+                          ? trimTopic(message)
+                          : DEFAULT_TOPIC),
+                  );
+                }
+              },
+            })
+            .then();
         }
         const summarizeIndex = Math.max(
           session.lastSummarizeIndex,
@@ -761,36 +760,38 @@ export const useChatStore = createPersistStore(
            * this param is just shit
            **/
           const { max_tokens, ...modelcfg } = modelConfig;
-          api.llm.chat({
-            messages: toBeSummarizedMsgs.concat(
-              createMessage({
-                role: "system",
-                content: Locale.Store.Prompt.Summarize,
-                date: "",
-              }),
-            ),
-            config: {
-              ...modelcfg,
-              stream: true,
-              model,
-              providerName,
-            },
-            onUpdate(message) {
-              session.memoryPrompt = message;
-            },
-            onFinish(message, responseRes) {
-              if (responseRes?.status === 200) {
-                console.log("[Memory] ", message);
-                get().updateTargetSession(session, (session) => {
-                  session.lastSummarizeIndex = lastSummarizeIndex;
-                  session.memoryPrompt = message; // Update the memory prompt for stored it in local storage
-                });
-              }
-            },
-            onError(err) {
-              console.error("[Summarize] ", err);
-            },
-          });
+          api.llm
+            .chat({
+              messages: toBeSummarizedMsgs.concat(
+                createMessage({
+                  role: "system",
+                  content: Locale.Store.Prompt.Summarize,
+                  date: "",
+                }),
+              ),
+              config: {
+                ...modelcfg,
+                stream: true,
+                model,
+                providerName,
+              },
+              onUpdate(message) {
+                session.memoryPrompt = message;
+              },
+              onFinish(message, responseRes) {
+                if (responseRes?.status === 200) {
+                  console.log("[Memory] ", message);
+                  get().updateTargetSession(session, (session) => {
+                    session.lastSummarizeIndex = lastSummarizeIndex;
+                    session.memoryPrompt = message; // Update the memory prompt for stored it in local storage
+                  });
+                }
+              },
+              onError(err) {
+                console.error("[Summarize] ", err);
+              },
+            })
+            .then();
         }
       },
 
@@ -840,11 +841,13 @@ export const useChatStore = createPersistStore(
                     typeof result === "object"
                       ? JSON.stringify(result)
                       : String(result);
-                  get().onUserInput(
-                    `\`\`\`json:mcp-response:${mcpRequest.clientId}\n${mcpResponse}\n\`\`\``,
-                    [],
-                    true,
-                  );
+                  get()
+                    .onUserInput(
+                      `\`\`\`json:mcp-response:${mcpRequest.clientId}\n${mcpResponse}\n\`\`\``,
+                      [],
+                      true,
+                    )
+                    .then();
                 })
                 .catch((error) => showToast("MCP execution failed", error));
             }

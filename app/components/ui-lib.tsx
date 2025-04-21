@@ -271,7 +271,7 @@ export function Input(props: InputProps) {
 }
 
 export function PasswordInput(
-  props: HTMLProps<HTMLInputElement> & { aria?: string },
+  props: HTMLProps<HTMLInputElement> & { "aria-describedby"?: string },
 ) {
   const [visible, setVisible] = useState(false);
   function changeVisibility() {
@@ -281,7 +281,7 @@ export function PasswordInput(
   return (
     <div className={"password-input-container"}>
       <IconButton
-        aria={props.aria}
+        aria-describedby={props["aria-describedby"]}
         icon={visible ? <EyeIcon /> : <EyeOffIcon />}
         onClick={changeVisibility}
         className={"password-eye"}

@@ -1,10 +1,10 @@
 import {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
   forwardRef,
+  useEffect,
   useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import { useParams } from "react-router";
 import { IconButton } from "./button";
@@ -18,7 +18,7 @@ import ReloadButtonIcon from "../icons/reload.svg";
 import Locale from "../locales";
 import { Modal, showToast } from "./ui-lib";
 import { copyToClipboard, downloadAs } from "../utils";
-import { Path, ApiPath, REPO_URL } from "@/app/constant";
+import { ApiPath, Path, REPO_URL } from "@/app/constant";
 import { Loading } from "./home";
 import styles from "./artifacts.module.scss";
 
@@ -138,7 +138,7 @@ export function ArtifactsShareButton({
             }
             throw Error();
           })
-          .catch((e) => {
+          .catch(() => {
             showToast(Locale.Export.Artifacts.Error);
           });
   return (
@@ -220,7 +220,7 @@ export function Artifacts() {
         })
         .then((res) => res.text())
         .then(setCode)
-        .catch((e) => {
+        .catch(() => {
           showToast(Locale.Export.Artifacts.Error);
         });
     }
